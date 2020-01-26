@@ -152,11 +152,11 @@ class DocumentList(generics.ListCreateAPIView):
         if project.randomize_document_order:
             queryset = queryset.annotate(sort_id=F('id') % self.request.user.id).order_by('sort_id')
 
-        data = {'userName': self.request.user,
-                'systemName': 'doccano',
-                'description': 'doclist'}
-
-        requests.post(url="https://annobot.herokuapp.com/statistics", data=data)
+        # data = {'userName': self.request.user,
+        #         'systemName': 'doccano',
+        #         'description': 'doclist'}
+        #
+        # requests.post(url="https://annobot.herokuapp.com/statistics", data=data)
 
         return queryset
 
