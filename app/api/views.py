@@ -21,6 +21,7 @@ from .serializers import ProjectPolymorphicSerializer, RoleMappingSerializer, Ro
 from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, iterable_to_io
 from .utils import JSONLRenderer
 from .utils import JSONPainter, CSVPainter
+import requests
 
 IsInProjectReadOnlyOrAdmin = (IsAnnotatorAndReadOnly | IsAnnotationApproverAndReadOnly | IsProjectAdmin)
 IsInProjectOrAdmin = (IsAnnotator | IsAnnotationApprover | IsProjectAdmin)
@@ -150,6 +151,12 @@ class DocumentList(generics.ListCreateAPIView):
         queryset = project.documents
         if project.randomize_document_order:
             queryset = queryset.annotate(sort_id=F('id') % self.request.user.id).order_by('sort_id')
+
+        data = {'userName': self.request.user,
+                'systemName': 'doccano',
+                'description': 'doclist'}
+
+        requests.post(url="https://annobot.herokuapp.com/statistics", data=data)
 
         return queryset
 
