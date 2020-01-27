@@ -22,6 +22,7 @@ from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLPar
 from .utils import JSONLRenderer
 from .utils import JSONPainter, CSVPainter
 import requests
+import json
 
 IsInProjectReadOnlyOrAdmin = (IsAnnotatorAndReadOnly | IsAnnotationApproverAndReadOnly | IsProjectAdmin)
 IsInProjectOrAdmin = (IsAnnotator | IsAnnotationApprover | IsProjectAdmin)
@@ -158,7 +159,8 @@ class DocumentList(generics.ListCreateAPIView):
                 'systemName': 'doccano',
                 'description': 'doclist'}
 
-        requests.post(url="https://annobot.herokuapp.com/statistics", data=data)
+        requests.post(url="http://localhost:8080/statistics", data=json.dumps(data),
+                      headers = {'Content-type': 'application/json'})
 
         return queryset
 
