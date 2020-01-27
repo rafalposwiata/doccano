@@ -153,9 +153,7 @@ class DocumentList(generics.ListCreateAPIView):
         if project.randomize_document_order:
             queryset = queryset.annotate(sort_id=F('id') % self.request.user.id).order_by('sort_id')
 
-        # self.request.user.id
-
-        data = {'userName': 'user1',
+        data = {'userName': self.request.user.id,
                 'systemName': 'doccano',
                 'description': 'doclist'}
 
