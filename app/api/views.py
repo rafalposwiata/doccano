@@ -153,7 +153,7 @@ class DocumentList(generics.ListCreateAPIView):
         if project.randomize_document_order:
             queryset = queryset.annotate(sort_id=F('id') % self.request.user.id).order_by('sort_id')
 
-        send_stats(self.request.user.username, 'doclist', None)
+        send_stats(self.request.user.username, 'open_page', '-')
         return queryset
 
     def perform_create(self, serializer):

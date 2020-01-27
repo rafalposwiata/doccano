@@ -34,6 +34,10 @@ body {
   background-color: #f3f3f3;
 }
 
+.aside {
+    display: none;
+}
+
 .aside .main {
   padding: 20px 40px;
   color: #6F7B7E;
