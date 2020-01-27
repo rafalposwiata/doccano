@@ -153,13 +153,7 @@ class DocumentList(generics.ListCreateAPIView):
         if project.randomize_document_order:
             queryset = queryset.annotate(sort_id=F('id') % self.request.user.id).order_by('sort_id')
 
-        data = {'userName': self.request.user.username,
-                'systemName': 'doccano',
-                'description': 'doclist'}
-
-        requests.post(url="https://annobot.herokuapp.com/statistics", data=json.dumps(data),
-                      headers = {'Content-type': 'application/json'})
-
+        send_stats(self.request.user.username, 'doclist', None)
         return queryset
 
     def perform_create(self, serializer):
@@ -194,7 +188,9 @@ class AnnotationList(generics.ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        request.data['document'] = self.kwargs['doc_id']
+        doc_id = self.kwargs['doc_id']
+        request.data['document'] = doc_id
+        send_stats(self.request.user.username, 'annotate', doc_id)
         return super().create(request, args, kwargs)
 
     def perform_create(self, serializer):
@@ -373,3 +369,13 @@ class RoleMappingDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RoleMappingSerializer
     lookup_url_kwarg = 'rolemapping_id'
     permission_classes = [IsAuthenticated & IsProjectAdmin]
+
+
+def send_stats(username, description, document_id):
+    data = {'userName': username,
+            'systemName': 'doccano',
+            'description': description,
+            'itemId': document_id}
+
+    requests.post(url="https://annobot.herokuapp.com/statistics", data=json.dumps(data),
+                  headers={'Content-type': 'application/json'})
