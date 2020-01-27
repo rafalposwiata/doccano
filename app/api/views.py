@@ -159,7 +159,7 @@ class DocumentList(generics.ListCreateAPIView):
                 'systemName': 'doccano',
                 'description': 'doclist'}
 
-        requests.post(url="http://localhost:8080/statistics", data=json.dumps(data),
+        requests.post(url="https://annobot.herokuapp.com/statistics", data=json.dumps(data),
                       headers = {'Content-type': 'application/json'})
 
         return queryset
