@@ -153,7 +153,7 @@ class DocumentList(generics.ListCreateAPIView):
         if project.randomize_document_order:
             queryset = queryset.annotate(sort_id=F('id') % self.request.user.id).order_by('sort_id')
 
-        send_stats(self.request.user.username, 'open_page', '-')
+        send_stats(self.request.user.username, 'open_page', '-', project.name)
         return queryset
 
     def perform_create(self, serializer):
@@ -188,9 +188,11 @@ class AnnotationList(generics.ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, pk=self.kwargs['project_id'])
+
         doc_id = self.kwargs['doc_id']
         request.data['document'] = doc_id
-        send_stats(self.request.user.username, 'annotate', doc_id)
+        send_stats(self.request.user.username, 'annotate', doc_id, project.name)
         return super().create(request, args, kwargs)
 
     def perform_create(self, serializer):
@@ -371,9 +373,9 @@ class RoleMappingDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated & IsProjectAdmin]
 
 
-def send_stats(username, description, document_id):
+def send_stats(username, description, document_id, project_name):
     data = {'userName': username,
-            'systemName': 'doccano',
+            'systemName': 'doccano_' + project_name,
             'description': description,
             'itemId': document_id}
 
