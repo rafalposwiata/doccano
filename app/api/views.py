@@ -15,7 +15,8 @@ from rest_framework_csv.renderers import CSVRenderer
 
 from .filters import DocumentFilter
 from .models import Project, Label, Document, RoleMapping, Role
-from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, IsOwnAnnotation, IsAnnotationApprover
+from .permissions import IsProjectAdmin, IsAnnotatorAndReadOnly, IsAnnotator, IsAnnotationApproverAndReadOnly, \
+    IsOwnAnnotation, IsAnnotationApprover
 from .serializers import ProjectSerializer, LabelSerializer, DocumentSerializer, UserSerializer
 from .serializers import ProjectPolymorphicSerializer, RoleMappingSerializer, RoleSerializer
 from .utils import CSVParser, ExcelParser, JSONParser, PlainTextParser, CoNLLParser, iterable_to_io
@@ -95,7 +96,7 @@ class StatisticsAPI(APIView):
         annotation_filter = Q(document_id__in=docs.all())
         if not project.collaborative_annotation:
             annotation_filter &= Q(user_id=self.request.user)
-        done = annotation_class.objects.filter(annotation_filter)\
+        done = annotation_class.objects.filter(annotation_filter) \
             .aggregate(Count('document', distinct=True))['document__count']
         remaining = total - done
         return {'total': total, 'remaining': remaining}
@@ -140,7 +141,7 @@ class LabelDetail(generics.RetrieveUpdateDestroyAPIView):
 class DocumentList(generics.ListCreateAPIView):
     serializer_class = DocumentSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    search_fields = ('text', )
+    search_fields = ('text',)
     ordering_fields = ('created_at', 'updated_at', 'doc_annotations__updated_at',
                        'seq_annotations__updated_at', 'seq2seq_annotations__updated_at')
     filter_class = DocumentFilter
@@ -375,7 +376,7 @@ class RoleMappingDetail(generics.RetrieveUpdateDestroyAPIView):
 
 def send_stats(username, description, document_id, project_name):
     data = {'userName': username,
-            'systemName': 'doccano_' + project_name,
+            'systemName': 'doccano' + ('_mob' if 'MOBILE' in project_name else ''),
             'description': description,
             'itemId': document_id}
 
